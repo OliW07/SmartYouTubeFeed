@@ -3,13 +3,16 @@
   "name": "Smart YouTube Feed",
   "description": "Filter Youtube reccomendations for productive / educational content",
   "version": "1.0",
-  "icons": {
-    "16": "images/TODO-ADD-THIS"
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "smart-youtube-feed@localhost"
+    }
   },
+  "host_permissions": ["*://*.youtube.com/*"],
   "content_scripts": [
     {
-      "js": ["./dist/contet.js"],
-      "matches": ["*.youtube.com/*"]
+      "js": ["dist/content.js"],
+      "matches": ["*://*.youtube.com/*"]
     }
   ]
 }
