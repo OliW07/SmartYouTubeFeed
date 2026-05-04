@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Smart YouTube Feed",
+  "description": "Filter Youtube reccomendations for productive / educational content",
+  "version": "1.0",
+  "icons": {
+    "16": "images/TODO-ADD-THIS"
+  },
+  "content_scripts": [
+    {
+      "js": ["./dist/contet.js"],
+      "matches": ["*.youtube.com/*"]
+    }
+  ]
+}
