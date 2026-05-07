@@ -31,7 +31,7 @@ function getMatch(title: string, channel: string): boolean {
   const c = channel.toLowerCase();
 
   const videoScore: number = score(title, channel);
-  if (videoScore < 0) {
+  if (videoScore <= 0) {
     console.log(
       `%c[YT Filter] ${title} was removed this pass`,
       "color: #ff9900;",
