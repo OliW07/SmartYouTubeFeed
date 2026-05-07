@@ -1,22 +1,8 @@
+import { score } from "./score";
+
 // YouTube Homepage Video Filter — Content Script
 
-// Test words
-const FILTER_KEYWORDS: string[] = ["the", "are", "code", "right"];
-const FILTER_CHANNELS: string[] = ["Oliver White"];
-
-// Logging
-
-function logRemoval(
-  title: string,
-  channel: string,
-  matchKeyword: string,
-  matchType: "keyword" | "channel",
-): void {
-  const matchDesc =
-    matchType === "keyword"
-      ? `keyword "${matchKeyword}"`
-      : `channel "${matchKeyword}"`;
-
+function logRemoval(title: string, channel: string): void {
   console.groupCollapsed(
     `%c[YT Filter] Removed%c "${title}"`,
     "color: #ff4444; font-weight: bold;",
@@ -24,7 +10,6 @@ function logRemoval(
   );
   console.log("  Title:    ", title);
   console.log("  Channel:  ", channel);
-  console.log("  Matched:  ", matchDesc);
   console.log("  Time:     ", new Date().toLocaleTimeString());
   console.groupEnd();
 }
@@ -41,26 +26,20 @@ function getItemText(item: Element): { title: string; channel: string } {
 
 // Filter logic
 
-function getMatch(
-  title: string,
-  channel: string,
-): { keyword: string; type: "keyword" | "channel" } | null {
+function getMatch(title: string, channel: string): boolean {
   const t = title.toLowerCase();
   const c = channel.toLowerCase();
 
-  for (const k of FILTER_KEYWORDS) {
-    if (t.includes(k.toLowerCase())) {
-      return { keyword: k, type: "keyword" };
-    }
+  const videoScore: number = score(title, channel);
+  if (videoScore < 0) {
+    console.log(
+      `%c[YT Filter] ${title} was removed this pass`,
+      "color: #ff9900;",
+    );
+    return true;
   }
 
-  for (const k of FILTER_CHANNELS) {
-    if (c.includes(k.toLowerCase())) {
-      return { keyword: k, type: "channel" };
-    }
-  }
-
-  return null;
+  return false;
 }
 
 function removeFromDOM(el: Element): void {
@@ -93,13 +72,11 @@ function applyFilters(): void {
       const { title, channel } = getItemText(item);
       if (!title && !channel) return;
 
-      const match = getMatch(title, channel);
+      const match: boolean = getMatch(title, channel);
       if (!match) return;
 
       removeFromDOM(item);
       count++;
-
-      logRemoval(title, channel, match.keyword, match.type);
     });
 
   document
