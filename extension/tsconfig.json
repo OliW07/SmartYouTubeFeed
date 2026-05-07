@@ -33,6 +33,8 @@
         "verbatimModuleSyntax": false,
         "isolatedModules": true,
         "noUncheckedSideEffectImports": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
     }
 }
