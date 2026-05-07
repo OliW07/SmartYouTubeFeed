@@ -45,7 +45,7 @@ function getMatch(title: string, channel: string): boolean {
 function removeFromDOM(el: Element): void {
   if (el.hasAttribute("data-filtered")) return;
   el.setAttribute("data-filtered", "true");
-  el.remove();
+  el.style.setProperty("display", "none", "important");
 }
 
 let filterPass = 0;
@@ -54,7 +54,7 @@ function applyFilters(): void {
   filterPass++;
   let count = 0;
   const items = document.querySelectorAll(
-    "ytd-rich-item-renderer:not([data-filtered])",
+    "ytd-rich-item-renderer:not([data-filtered]):not([data-processed])",
   );
 
   if (items.length === 0 && filterPass < 15) {
@@ -65,10 +65,11 @@ function applyFilters(): void {
   }
 
   document
-    .querySelectorAll("ytd-rich-item-renderer:not([data-filtered])")
+    .querySelectorAll("ytd-rich-item-renderer:not([data-filtered]):not([data-processed])")
     .forEach((item) => {
       if (item.querySelector("ytd-ad-slot-renderer")) return;
 
+      item.setAttribute("data-processed", "true");
       const { title, channel } = getItemText(item);
       if (!title && !channel) return;
 
@@ -80,8 +81,9 @@ function applyFilters(): void {
     });
 
   document
-    .querySelectorAll("ytd-rich-section-renderer:not([data-filtered])")
+    .querySelectorAll("ytd-rich-section-renderer:not([data-filtered]):not([data-processed])")
     .forEach((section) => {
+      section.setAttribute("data-processed", "true");
       if (section.getBoundingClientRect().height === 0) {
         removeFromDOM(section);
       }
@@ -93,6 +95,26 @@ function applyFilters(): void {
       "color: #ff9900;",
     );
   }
+}
+
+// Scroll anchoring
+
+function findAnchorItem(): { el: Element; top: number } | null {
+  const items = document.querySelectorAll(
+    "ytd-rich-item-renderer[data-processed]",
+  );
+  if (items.length === 0) return null;
+  let best: Element | null = null;
+  let bestDist = Infinity;
+  for (const item of items) {
+    const rect = item.getBoundingClientRect();
+    const dist = Math.abs(rect.top);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = item;
+    }
+  }
+  return { el: best!, top: best!.getBoundingClientRect().top };
 }
 
 // Infinite scroll observer
@@ -131,7 +153,18 @@ function attachObserver(retries = 0): void {
     if (!hasNewItems) return;
 
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(applyFilters, 150);
+    const anchor = findAnchorItem();
+    const savedScrollY = window.scrollY;
+    debounceTimer = setTimeout(() => {
+      applyFilters();
+      requestAnimationFrame(() => {
+        if (anchor && document.contains(anchor.el)) {
+          window.scrollBy(0, anchor.el.getBoundingClientRect().top - anchor.top);
+        } else {
+          window.scrollTo(window.scrollX, savedScrollY);
+        }
+      });
+    }, 150);
   });
 
   observer.observe(contents, { childList: true });
