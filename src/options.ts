@@ -73,6 +73,7 @@ function setupAddButton(
   listId: string,
   entries: Record<string, number>,
   render: () => void,
+  onAdd?: () => void,
 ): void {
   const input = document.getElementById(inputId) as HTMLInputElement;
   const signBtn = document.getElementById(signId) as HTMLButtonElement;
@@ -99,6 +100,7 @@ function setupAddButton(
       signBtn.textContent = "+";
     }
     render();
+    if (onAdd) onAdd();
     input.focus();
   };
 
@@ -122,15 +124,30 @@ document.addEventListener("DOMContentLoaded", async () => {
   const keywordList = document.getElementById("keywordList")!;
   const channelList = document.getElementById("channelList")!;
 
+  async function persistCustomEntries() {
+    try {
+      const stored = (await chrome.storage.sync.get(STORAGE_KEY))[STORAGE_KEY] as Partial<ExtensionSettings> | undefined;
+      await chrome.storage.sync.set({
+        [STORAGE_KEY]: {
+          ...(stored || {}),
+          customKeywords: settings.customKeywords,
+          customChannels: settings.customChannels,
+        },
+      });
+    } catch {}
+  }
+
   function renderKeywords() {
     renderEntries(keywordList, settings.customKeywords, (key) => {
       delete settings.customKeywords[key];
+      persistCustomEntries();
       renderKeywords();
     });
   }
   function renderChannels() {
     renderEntries(channelList, settings.customChannels, (key) => {
       delete settings.customChannels[key];
+      persistCustomEntries();
       renderChannels();
     });
   }
@@ -148,8 +165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderKeywords();
   renderChannels();
 
-  setupAddButton("keywordInput", "keywordSign", "keywordWeight", "keywordList", settings.customKeywords, renderKeywords);
-  setupAddButton("channelInput", "channelSign", "channelWeight", "channelList", settings.customChannels, renderChannels);
+  setupAddButton("keywordInput", "keywordSign", "keywordWeight", "keywordList", settings.customKeywords, renderKeywords, persistCustomEntries);
+  setupAddButton("channelInput", "channelSign", "channelWeight", "channelList", settings.customChannels, renderChannels, persistCustomEntries);
 
   slider.addEventListener("input", () => {
     updateDisplay(parseInt(slider.value, 10));
