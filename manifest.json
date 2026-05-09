@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Smart YouTube Feed",
   "description": "Filter Youtube reccomendations for productive / educational content",
-  "version": "1.0",
+  "version": "1.0.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "smart-youtube-feed@localhost"
@@ -14,8 +14,12 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "host_permissions": ["*://*.youtube.com/*"],
-  "permissions": ["storage"],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
+  "permissions": [
+    "storage"
+  ],
   "action": {
     "default_popup": "dist/options.html",
     "default_title": "Smart YouTube Feed",
@@ -28,8 +32,12 @@
   },
   "content_scripts": [
     {
-      "js": ["dist/content.js"],
-      "matches": ["*://*.youtube.com/*"]
+      "js": [
+        "dist/content.js"
+      ],
+      "matches": [
+        "*://*.youtube.com/*"
+      ]
     }
   ]
 }

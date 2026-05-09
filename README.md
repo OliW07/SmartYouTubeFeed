@@ -62,11 +62,80 @@ After editing, run `npm run build` and reload the extension.
 
 ---
 
-## Build
+## Development
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+
+### Setup
 
 ```sh
 npm install
+```
+
+### Build
+
+```sh
 npm run build
 ```
 
-Build output goes to `dist/`. Load the extension in Chrome via `chrome://extensions` (Developer mode → Load unpacked) or in Firefox via `about:debugging`.
+Output goes to `dist/`. Load the unpacked extension:
+
+- **Chrome:** `chrome://extensions` → Developer mode → Load unpacked → select this folder
+- **Firefox:** `about:debugging` → This Firefox → Temporary Extensions → Load Temporary Add-on → select `manifest.json`
+
+---
+
+## Release process
+
+Releases are done via npm's built-in versioning, which bumps the version in both `package.json` and `manifest.json`, creates a git tag, and pushes to GitHub. A CI workflow then builds and attaches the extension zip to a GitHub Release.
+
+### Create a release
+
+```sh
+# Ensure you're on main with no uncommitted changes
+git checkout main
+git pull
+
+# Bump the version (patch = bug fix, minor = new feature, major = breaking)
+npm version patch
+
+# Push the commit and tag to GitHub
+git push --follow-tags
+```
+
+`npm version patch` increments `1.0.0` → `1.0.1`.  
+Use `npm version minor` for `1.0.0` → `1.1.0`, or `npm version major` for `1.0.0` → `2.0.0`.
+
+### What happens automatically
+
+1. `npm version` bumps the version in `package.json` and `manifest.json`, creates a commit and a `vX.Y.Z` tag
+2. Pushing the tag triggers the **Release** GitHub Action (`.github/workflows/release.yml`)
+3. The Action runs `npm ci`, `npm run pack` (build + zip), and creates a **GitHub Release** with `smart-youtube-feed.zip` attached
+
+### Upload to the Chrome Web Store
+
+1. Go to the [Releases page](https://github.com/OliW07/SmartYouTubeFeed/releases) on GitHub
+2. Download `smart-youtube-feed.zip` from the latest release
+3. Go to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+4. Upload the zip as a new package or new version
+
+---
+
+## Project structure
+
+```
+├── .github/workflows/release.yml    CI workflow for building releases
+├── icons/                            Extension icons (16/32/48/128)
+├── data/keywords.json                Built-in keyword and channel weights
+├── dist/                             Build output (gitignored)
+├── src/
+│   ├── content.ts                    Content script injected on YouTube
+│   ├── score.ts                      Keyword/channel scoring logic
+│   ├── options.html                  Extension popup HTML
+│   └── options.ts                    Extension popup logic
+├── manifest.json                     Extension manifest (MV3)
+└── package.json                      npm scripts and dependencies
+```

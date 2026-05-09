@@ -2,10 +2,12 @@
   "name": "extension",
   "version": "1.0.0",
   "description": "Smart YouTube Feed extension",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100 && esbuild src/options.ts --bundle --outfile=dist/options.js --platform=browser --target=chrome100 && cp src/options.html dist/options.html",
-    "watch": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100 --watch"
+    "watch": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100 --watch",
+    "version": "node -e \"const fs = require('fs'); const p = JSON.parse(fs.readFileSync('package.json')); const m = JSON.parse(fs.readFileSync('manifest.json')); m.version = p.version; fs.writeFileSync('manifest.json', JSON.stringify(m, null, 2) + '\\n');\" && git add manifest.json",
+    "pack": "npm run build && rm -f dist/score.* dist/*.d.ts dist/*.d.ts.map && zip -r smart-youtube-feed.zip manifest.json dist/ icons/"
   },
   "keywords": [],
   "author": "",
