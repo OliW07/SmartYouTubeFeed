@@ -5,7 +5,10 @@
   "version": "1.0.0",
   "browser_specific_settings": {
     "gecko": {
-      "id": "smart-youtube-feed@localhost"
+      "id": "smart-youtube-feed@localhost",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
   "icons": {
