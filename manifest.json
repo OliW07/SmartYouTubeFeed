@@ -9,6 +9,11 @@
     }
   },
   "host_permissions": ["*://*.youtube.com/*"],
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "dist/options.html",
+    "default_title": "Smart YouTube Feed"
+  },
   "content_scripts": [
     {
       "js": ["dist/content.js"],

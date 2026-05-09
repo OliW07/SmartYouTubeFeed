@@ -1,18 +1,25 @@
 import { score } from "./score";
 
-// YouTube Homepage Video Filter — Content Script
+const STORAGE_KEY = "settings";
 
-function logRemoval(title: string, channel: string): void {
-  console.groupCollapsed(
-    `%c[YT Filter] Removed%c "${title}"`,
-    "color: #ff4444; font-weight: bold;",
-    "color: inherit; font-weight: normal;",
-  );
-  console.log("  Title:    ", title);
-  console.log("  Channel:  ", channel);
-  console.log("  Time:     ", new Date().toLocaleTimeString());
-  console.groupEnd();
+interface ExtensionSettings {
+  filterThreshold: number;
 }
+
+const DEFAULT_SETTINGS: ExtensionSettings = {
+  filterThreshold: 0,
+};
+
+async function loadSettings(): Promise<ExtensionSettings> {
+  try {
+    const result = await chrome.storage.sync.get(STORAGE_KEY);
+    return (result[STORAGE_KEY] as ExtensionSettings) || DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+let settings: ExtensionSettings = DEFAULT_SETTINGS;
 
 function getItemText(item: Element): { title: string; channel: string } {
   const title =
@@ -27,19 +34,8 @@ function getItemText(item: Element): { title: string; channel: string } {
 // Filter logic
 
 function getMatch(title: string, channel: string): boolean {
-  const t = title.toLowerCase();
-  const c = channel.toLowerCase();
-
   const videoScore: number = score(title, channel);
-  if (videoScore <= 0) {
-    console.log(
-      `%c[YT Filter] ${title} was removed this pass`,
-      "color: #ff9900;",
-    );
-    return true;
-  }
-
-  return false;
+  return videoScore <= settings.filterThreshold;
 }
 
 function removeFromDOM(el: Element): void {
@@ -52,15 +48,13 @@ let filterPass = 0;
 
 function applyFilters(): void {
   filterPass++;
-  let count = 0;
+  const removed: { title: string; channel: string }[] = [];
+
   const items = document.querySelectorAll(
     "ytd-rich-item-renderer:not([data-filtered]):not([data-processed])",
   );
 
   if (items.length === 0 && filterPass < 15) {
-    console.log(
-      `[YT Filter] No items yet, will retry filter pass ${filterPass + 1}...`,
-    );
     setTimeout(applyFilters, 400);
   }
 
@@ -77,7 +71,7 @@ function applyFilters(): void {
       if (!match) return;
 
       removeFromDOM(item);
-      count++;
+      removed.push({ title, channel });
     });
 
   document
@@ -89,11 +83,15 @@ function applyFilters(): void {
       }
     });
 
-  if (count > 0) {
-    console.log(
-      `%c[YT Filter] ${count} video(s) removed this pass`,
-      "color: #ff9900;",
+  if (removed.length > 0) {
+    console.groupCollapsed(
+      `%c[YT Filter] ${removed.length} video(s) removed`,
+      "color: #ff9900; font-weight: bold;",
     );
+    for (const { title, channel } of removed) {
+      console.log(`${title} — ${channel}`);
+    }
+    console.groupEnd();
   }
 }
 
@@ -126,12 +124,7 @@ function attachObserver(retries = 0): void {
 
   if (!contents) {
     if (retries < 20) {
-      console.log(
-        `[YT Filter] #contents not found, retrying (${retries + 1}/20)...`,
-      );
       setTimeout(() => attachObserver(retries + 1), 300);
-    } else {
-      console.warn("[YT Filter] Could not find #contents after 20 retries.");
     }
     return;
   }
@@ -168,20 +161,18 @@ function attachObserver(retries = 0): void {
   });
 
   observer.observe(contents, { childList: true });
-  console.log("%c[YT Filter] Observer attached to #contents.", "color: #888;");
 }
 
 // Init
 
-console.log(
-  "%c[YT Filter] Starting — waiting for YouTube DOM...",
-  "color: #ff9900; font-weight: bold;",
-);
+async function init(): Promise<void> {
+  settings = await loadSettings();
+  console.log(
+    "%c[YT Filter] Active — threshold: " + settings.filterThreshold,
+    "color: #ff9900; font-weight: bold;",
+  );
+  setTimeout(applyFilters, 500);
+  attachObserver();
+}
 
-setTimeout(applyFilters, 500);
-attachObserver();
-
-console.log(
-  "%c[YT Filter] Ready — check console for removed videos.",
-  "color: #ff9900; font-weight: bold;",
-);
+init();

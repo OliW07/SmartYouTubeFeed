@@ -6,3 +6,6 @@ build/
 
 *.crx
 *.pem
+
+# Windows metadata from downloads
+*.Zone.Identifier

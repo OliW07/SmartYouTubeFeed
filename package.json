@@ -4,15 +4,16 @@
   "description": "Smart YouTube Feed extension",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100",
+    "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100 && esbuild src/options.ts --bundle --outfile=dist/options.js --platform=browser --target=chrome100 && cp src/options.html dist/options.html",
     "watch": "esbuild src/content.ts --bundle --outfile=dist/content.js --platform=browser --target=chrome100 --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/chrome": "^0.1.42",
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.3",
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "typescript": "^6.0.3"
   }
 }
