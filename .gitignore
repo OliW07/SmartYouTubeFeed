@@ -8,4 +8,5 @@ build/
 *.pem
 
 # Windows metadata from downloads
-*.Zone.Identifier
+*:Zone.Identifier
+*:Zone.Identifier
