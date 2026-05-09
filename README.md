@@ -1,7 +1,7 @@
 <p align="center">
   <img src="icons/title.png" width="400" alt="Smart YouTube Feed" />
 </p>
-<h1 align="center" style="margin-top: -70px;">SmartYouTubeFeed</h1>
+<h1 align="center" style="margin-top: -85px;">SmartYouTubeFeed</h1>
 
 <p align="center">
   <b>Browser extension that surfaces educational, high-signal YouTube content by filtering out low-value recommendations.</b>
