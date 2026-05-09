@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="icons/title.png" width="400" alt="Smart YouTube Feed" />
+  <img src="icons/icon128.png" alt="Smart YouTube Feed" />
 </p>
+<h1 align="center">SmartYouTubeFeed</h1>
 
-Filters YouTube feeds to surface educational, high-signal content using keyword-based scoring. Dynamically 'retrains' the YouTube algorithm in background with "I'm not interested" user feedback to Google.
+<p align="center">
+  Filters YouTube feeds to surface educational, high-signal content using keyword-based scoring. Dynamically retrains the YouTube algorithm with "I'm not interested" feedback.
+</p>
