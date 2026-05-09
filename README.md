@@ -24,14 +24,26 @@ Click the extension icon in your browser toolbar to open the popup.
 | Setting | Description |
 |---|---|
 | **Filter threshold** | Controls how aggressive the filtering is. Lower values are more lenient; higher values remove more videos. Default: `0` (balanced). |
-
-Adjust the slider and click **Save**. Changes apply after refreshing YouTube.
+| **Custom keywords / channels** | Add your own terms and weights directly in the popup. Saved instantly to your browser storage. Entries apply on top of the built-in keyword list and persist across sessions. |
 
 ---
 
-## Adding keywords and channels
+## Custom entries from the popup
 
-Edit `data/keywords.json` to add or adjust weights:
+Open the popup and scroll to the **Custom Keywords** and **Custom Channels** sections.
+
+1. Type a word or channel name
+2. Toggle the **+ / −** button for positive (keep) or negative (remove) weighting
+3. Set the weight magnitude (1–10)
+4. Click **Add** or press **Enter**
+
+Added entries appear below with a ✕ button to remove them. Click **Save** at the top and refresh YouTube to apply.
+
+---
+
+## Advanced: editing the built-in keyword list
+
+The bundled keyword list lives in `data/keywords.json`. Edit it directly to add or adjust weights:
 
 ```json
 {
@@ -46,7 +58,7 @@ Edit `data/keywords.json` to add or adjust weights:
 }
 ```
 
-Positive weights keep matching videos visible; negative weights hide them. After editing, run `npm run build` and reload the extension.
+After editing, run `npm run build` and reload the extension.
 
 ---
 
@@ -58,4 +70,3 @@ npm run build
 ```
 
 Build output goes to `dist/`. Load the extension in Chrome via `chrome://extensions` (Developer mode → Load unpacked) or in Firefox via `about:debugging`.
-
