@@ -4,6 +4,8 @@ const STORAGE_KEY = "settings";
 
 interface ExtensionSettings {
   filterThreshold: number;
+  customKeywords?: Record<string, number>;
+  customChannels?: Record<string, number>;
 }
 
 const DEFAULT_SETTINGS: ExtensionSettings = {
@@ -34,7 +36,12 @@ function getItemText(item: Element): { title: string; channel: string } {
 // Filter logic
 
 function getMatch(title: string, channel: string): boolean {
-  const videoScore: number = score(title, channel);
+  const videoScore: number = score(
+    title,
+    channel,
+    settings.customKeywords,
+    settings.customChannels,
+  );
   return videoScore <= settings.filterThreshold;
 }
 

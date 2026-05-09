@@ -2,10 +2,14 @@ const STORAGE_KEY = "settings";
 
 interface ExtensionSettings {
   filterThreshold: number;
+  customKeywords: Record<string, number>;
+  customChannels: Record<string, number>;
 }
 
 const DEFAULTS: ExtensionSettings = {
   filterThreshold: 0,
+  customKeywords: {},
+  customChannels: {},
 };
 
 function getThresholdDescription(value: number): string {
@@ -18,6 +22,90 @@ function getThresholdDescription(value: number): string {
   return "Maximum — almost everything gets filtered out";
 }
 
+function renderEntries(
+  container: HTMLElement,
+  entries: Record<string, number>,
+  onRemove: (key: string) => void,
+): void {
+  container.innerHTML = "";
+  const keys = Object.keys(entries);
+  if (keys.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty-msg";
+    empty.textContent = "None added";
+    container.appendChild(empty);
+    return;
+  }
+  for (const [name, weight] of Object.entries(entries)) {
+    const row = document.createElement("div");
+    row.className = "entry";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "entry-name";
+    nameSpan.textContent = name;
+
+    const weightSpan = document.createElement("span");
+    weightSpan.className = "entry-weight " + (weight > 0 ? "pos" : "neg");
+    weightSpan.textContent = (weight > 0 ? "+" : "") + weight;
+
+    const labelSpan = document.createElement("span");
+    const isPos = weight > 0;
+    labelSpan.className = "entry-label " + (isPos ? "pos" : "neg");
+    labelSpan.textContent = isPos ? "keep" : "remove";
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "remove-btn";
+    removeBtn.textContent = "✕";
+    removeBtn.addEventListener("click", () => onRemove(name));
+
+    row.appendChild(nameSpan);
+    row.appendChild(weightSpan);
+    row.appendChild(labelSpan);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  }
+}
+
+function setupAddButton(
+  inputId: string,
+  signId: string,
+  weightId: string,
+  listId: string,
+  entries: Record<string, number>,
+  render: () => void,
+): void {
+  const input = document.getElementById(inputId) as HTMLInputElement;
+  const signBtn = document.getElementById(signId) as HTMLButtonElement;
+  const weight = document.getElementById(weightId) as HTMLInputElement;
+
+  signBtn.addEventListener("click", () => {
+    const isNeg = signBtn.classList.contains("neg");
+    signBtn.classList.toggle("neg", !isNeg);
+    signBtn.classList.toggle("pos", isNeg);
+    signBtn.textContent = isNeg ? "+" : "−";
+  });
+
+  const add = () => {
+    const text = input.value.trim().toLowerCase();
+    if (!text) return;
+    const sign = signBtn.classList.contains("neg") ? -1 : 1;
+    const val = parseInt(weight.value, 10) || 1;
+    entries[text] = sign * val;
+    input.value = "";
+    weight.value = "1";
+    if (signBtn.classList.contains("neg")) {
+      signBtn.classList.remove("neg");
+      signBtn.classList.add("pos");
+      signBtn.textContent = "+";
+    }
+    render();
+    input.focus();
+  };
+
+  document.getElementById(inputId.replace("Input", "Add"))!.addEventListener("click", add);
+  input.addEventListener("keydown", (e) => { if (e.key === "Enter") add(); });
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   const slider = document.getElementById("filterThreshold") as HTMLInputElement;
   const valueDisplay = document.getElementById("thresholdValue") as HTMLSpanElement;
@@ -28,6 +116,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const result = await chrome.storage.sync.get(STORAGE_KEY);
   const settings: ExtensionSettings = result[STORAGE_KEY] || DEFAULTS;
+  settings.customKeywords ??= {};
+  settings.customChannels ??= {};
+
+  const keywordList = document.getElementById("keywordList")!;
+  const channelList = document.getElementById("channelList")!;
+
+  function renderKeywords() {
+    renderEntries(keywordList, settings.customKeywords, (key) => {
+      delete settings.customKeywords[key];
+      renderKeywords();
+    });
+  }
+  function renderChannels() {
+    renderEntries(channelList, settings.customChannels, (key) => {
+      delete settings.customChannels[key];
+      renderChannels();
+    });
+  }
 
   function updateDisplay(val: number) {
     slider.value = String(val);
@@ -39,6 +145,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   updateDisplay(settings.filterThreshold);
+  renderKeywords();
+  renderChannels();
+
+  setupAddButton("keywordInput", "keywordSign", "keywordWeight", "keywordList", settings.customKeywords, renderKeywords);
+  setupAddButton("channelInput", "channelSign", "channelWeight", "channelList", settings.customChannels, renderChannels);
 
   slider.addEventListener("input", () => {
     updateDisplay(parseInt(slider.value, 10));
@@ -53,7 +164,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   saveBtn.addEventListener("click", async () => {
     const val = parseInt(slider.value, 10);
     await chrome.storage.sync.set({
-      [STORAGE_KEY]: { filterThreshold: val },
+      [STORAGE_KEY]: {
+        filterThreshold: val,
+        customKeywords: settings.customKeywords,
+        customChannels: settings.customChannels,
+      },
     });
     statusEl.textContent = "Settings saved!";
     setTimeout(() => { statusEl.textContent = ""; }, 2000);

@@ -95,6 +95,175 @@
       margin-top: 12px;
       text-align: center;
     }
+
+    hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 16px 0;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .add-row input[type="text"] {
+      flex: 1;
+      padding: 5px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+    .add-row input[type="text"]:focus {
+      border-color: #065fd4;
+    }
+    .weight-group {
+      display: flex;
+      gap: 2px;
+      align-items: stretch;
+    }
+    .sign-btn {
+      width: 28px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      background: #f8f8f8;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #444;
+    }
+    .sign-btn.neg {
+      background: #fde8e8;
+      border-color: #f5c6c6;
+      color: #c0392b;
+    }
+    .sign-btn.pos {
+      background: #e8f5e9;
+      border-color: #c6e6c9;
+      color: #27ae60;
+    }
+    .weight-group input[type="number"] {
+      width: 40px;
+      padding: 5px 4px;
+      border: 1px solid #ddd;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .weight-group input[type="number"]::-webkit-inner-spin-button,
+    .weight-group input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .weight-group input[type="number"]:focus {
+      border-color: #065fd4;
+    }
+    .add-btn {
+      padding: 5px 10px;
+      background: #065fd4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .add-btn:hover { background: #0456c4; }
+
+    .entry-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-bottom: 12px;
+      min-height: 4px;
+    }
+    .entry-list:empty {
+      min-height: 0;
+    }
+    .entry {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .entry-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .entry-weight {
+      font-weight: 600;
+      font-size: 11px;
+      min-width: 24px;
+      text-align: right;
+    }
+    .entry-weight.pos { color: #27ae60; }
+    .entry-weight.neg { color: #c0392b; }
+    .remove-btn {
+      width: 18px;
+      height: 18px;
+      border: none;
+      border-radius: 3px;
+      background: transparent;
+      color: #999;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .remove-btn:hover {
+      background: #fde8e8;
+      color: #c0392b;
+    }
+
+    .section-sub {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .entry-label {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      line-height: 1.4;
+      letter-spacing: 0.3px;
+    }
+    .entry-label.pos {
+      background: #e8f5e9;
+      color: #27ae60;
+    }
+    .entry-label.neg {
+      background: #fde8e8;
+      color: #c0392b;
+    }
+    .empty-msg {
+      font-size: 11px;
+      color: #bbb;
+      font-style: italic;
+      padding: 2px 0;
+    }
   </style>
 </head>
 <body>
@@ -129,6 +298,33 @@
   <button class="save-btn" id="save">Save</button>
   <div class="status" id="status"></div>
   <div class="hint">Changes apply after refreshing YouTube.</div>
+
+  <hr />
+
+  <div class="section-title">Custom Keywords</div>
+  <div class="section-sub">Positive keeps the video · Negative removes it</div>
+  <div class="add-row">
+    <input type="text" id="keywordInput" placeholder="keyword" />
+    <div class="weight-group">
+      <button class="sign-btn pos" id="keywordSign">+</button>
+      <input type="number" id="keywordWeight" value="1" min="1" max="10" />
+    </div>
+    <button class="add-btn" id="keywordAdd">Add</button>
+  </div>
+  <div class="entry-list" id="keywordList"></div>
+
+  <div class="section-title">Custom Channels</div>
+  <div class="section-sub">Positive keeps the video · Negative removes it</div>
+  <div class="add-row">
+    <input type="text" id="channelInput" placeholder="channel name" />
+    <div class="weight-group">
+      <button class="sign-btn pos" id="channelSign">+</button>
+      <input type="number" id="channelWeight" value="1" min="1" max="10" />
+    </div>
+    <button class="add-btn" id="channelAdd">Add</button>
+  </div>
+  <div class="entry-list" id="channelList"></div>
+
   <script src="options.js"></script>
 </body>
 </html>
