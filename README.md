@@ -1,7 +1,7 @@
 <p align="center">
   <img src="icons/title.png" width="400" alt="Smart YouTube Feed" />
 </p>
-<h1 align="center">SmartYouTubeFeed</h1>
+<h1 align="center" style="margin-top: -30px;">SmartYouTubeFeed</h1>
 
 <p align="center">
   <b>Browser extension that surfaces educational, high-signal YouTube content by filtering out low-value recommendations.</b>
@@ -58,10 +58,4 @@ npm run build
 ```
 
 Build output goes to `dist/`. Load the extension in Chrome via `chrome://extensions` (Developer mode → Load unpacked) or in Firefox via `about:debugging`.
-
----
-
-## Tech
-
-TypeScript · esbuild · Manifest V3 · `chrome.storage.sync`
 
