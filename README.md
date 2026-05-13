@@ -1,10 +1,19 @@
 <p align="center">
   <img src="icons/title.png" width="400" alt="Smart YouTube Feed" />
 </p>
-<h1 align="center" style="margin-top: -85px;">SmartYouTubeFeed</h1>
+<h1 align="center" style="margin-top: -65px;">SmartYouTubeFeed</h1>
 
 <p align="center">
   <b>Browser extension that surfaces educational, high-signal YouTube content by filtering out low-value recommendations.</b>
+</p>
+
+<p align="center">
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/smart-youtube-feed/">
+    <img src="https://img.shields.io/badge/Firefox-Addon-ff7139?logo=firefox" alt="Firefox Addon" />
+  </a>
+  <a href="#">
+    <img src="https://img.shields.io/badge/Chrome-Under%20Review-4285F4?logo=googlechrome" alt="Chrome Under Review" />
+  </a>
 </p>
 
 ---
